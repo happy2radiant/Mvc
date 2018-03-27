@@ -17,6 +17,12 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         private const string ModelPropertyName = "Model";
         private readonly PageHandlerPageFilter _pageHandlerPageFilter = new PageHandlerPageFilter();
         private readonly PageHandlerResultFilter _pageHandlerResultFilter = new PageHandlerResultFilter();
+        private readonly IModelMetadataProvider _modelMetadataProvider;
+
+        public DefaultPageApplicationModelProvider(IModelMetadataProvider modelMetadataProvider)
+        {
+            _modelMetadataProvider = modelMetadataProvider;
+        }
 
         /// <inheritdoc />
         public int Order => -1000;
@@ -217,9 +223,20 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
                 throw new ArgumentNullException(nameof(parameter));
             }
 
-            return new PageParameterModel(parameter, parameter.GetCustomAttributes(inherit: true))
+            var attributes = parameter.GetCustomAttributes(inherit: true);
+
+            BindingInfo bindingInfo = null;
+            if (_modelMetadataProvider is ModelMetadataProvider modelMetadataProviderBase)
             {
-                BindingInfo = BindingInfo.GetBindingInfo(parameter.GetCustomAttributes()),
+                var modelMetadata = modelMetadataProviderBase.GetMetadataForParameter(parameter);
+                bindingInfo = BindingInfo.GetBindingInfo(modelMetadata);
+            }
+
+            bindingInfo = bindingInfo ?? BindingInfo.GetBindingInfo(attributes);
+
+            return new PageParameterModel(parameter, attributes)
+            {
+                BindingInfo = bindingInfo,
                 ParameterName = parameter.Name,
             };
         }
@@ -237,12 +254,18 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
             }
 
             var propertyAttributes = property.GetCustomAttributes(inherit: true);
-            var handlerAttributes = property.DeclaringType.GetCustomAttributes(inherit: true);
 
-            // Look for binding info on the handler if nothing is specified on the property.
-            // This allows BindProperty attributes on handlers to apply to properties.
-            var bindingInfo = BindingInfo.GetBindingInfo(propertyAttributes) ??
-                BindingInfo.GetBindingInfo(handlerAttributes);
+            var propertyMetadata = _modelMetadataProvider.GetMetadataForProperty(property.DeclaringType, property.Name);
+            var bindingInfo = BindingInfo.GetBindingInfo(propertyMetadata) ?? BindingInfo.GetBindingInfo(propertyAttributes);
+
+            if (bindingInfo == null)
+            {
+                // Look for binding info on the handler if nothing is specified on the property.
+                // This allows BindProperty attributes on handlers to apply to properties.
+                var handlerMetadata = _modelMetadataProvider.GetMetadataForType(property.DeclaringType);
+                var handlerAttributes = property.DeclaringType.GetCustomAttributes(inherit: true);
+                bindingInfo = BindingInfo.GetBindingInfo(handlerMetadata) ?? BindingInfo.GetBindingInfo(handlerAttributes);
+            }
 
             var model = new PagePropertyModel(property, propertyAttributes)
             {

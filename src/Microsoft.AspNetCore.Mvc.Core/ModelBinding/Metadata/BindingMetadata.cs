@@ -75,5 +75,11 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Metadata
         /// See <see cref="ModelMetadata.PropertyFilterProvider"/>.
         /// </summary>
         public IPropertyFilterProvider PropertyFilterProvider { get; set; }
+
+        /// <summary>
+        /// Gets or sets a predicate which determines whether or not the model should be bound based on state
+        /// from the current request.
+        /// </summary>
+        public Func<ActionContext, bool> RequestPredicate { get; set; }
     }
 }

@@ -20,10 +20,14 @@ namespace Microsoft.AspNetCore.Mvc.Internal
     public class DefaultApplicationModelProvider : IApplicationModelProvider
     {
         private readonly ICollection<IFilterMetadata> _globalFilters;
+        private readonly IModelMetadataProvider _modelMetadataProvider;
 
-        public DefaultApplicationModelProvider(IOptions<MvcOptions> mvcOptionsAccessor)
+        public DefaultApplicationModelProvider(
+            IOptions<MvcOptions> mvcOptionsAccessor,
+            IModelMetadataProvider modelMetadataProvider)
         {
             _globalFilters = mvcOptionsAccessor.Value.Filters;
+            _modelMetadataProvider = modelMetadataProvider;
         }
 
         /// <inheritdoc />
@@ -118,9 +122,9 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             do
             {
                 routeAttributes = currentTypeInfo
-                        .GetCustomAttributes(inherit: false)
-                        .OfType<IRouteTemplateProvider>()
-                        .ToArray();
+                    .GetCustomAttributes(inherit: false)
+                    .OfType<IRouteTemplateProvider>()
+                    .ToArray();
 
                 if (routeAttributes.Length > 0)
                 {
@@ -213,24 +217,20 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 throw new ArgumentNullException(nameof(propertyInfo));
             }
 
-            // CoreCLR returns IEnumerable<Attribute> from GetCustomAttributes - the OfType<object>
-            // is needed to so that the result of ToArray() is object
             var attributes = propertyInfo.GetCustomAttributes(inherit: true);
-            var propertyModel = new PropertyModel(propertyInfo, attributes);
-            var bindingInfo = BindingInfo.GetBindingInfo(attributes);
-            if (bindingInfo != null)
+            var propertyModel = new PropertyModel(propertyInfo, attributes)
             {
-                propertyModel.BindingInfo = bindingInfo;
-            }
-            else if (IsFormFileType(propertyInfo.PropertyType))
+                PropertyName = propertyInfo.Name
+            };
+
+            var modelMetadata = _modelMetadataProvider.GetMetadataForProperty(propertyInfo.DeclaringType, propertyInfo.Name);
+            var bindingInfo = BindingInfo.GetBindingInfo(modelMetadata) ?? BindingInfo.GetBindingInfo(attributes);
+            if (bindingInfo == null && IsFormFileType(propertyInfo.PropertyType))
             {
-                propertyModel.BindingInfo = new BindingInfo
-                {
-                    BindingSource = BindingSource.FormFile,
-                };
+                bindingInfo = new BindingInfo { BindingSource = BindingSource.FormFile, };
             }
 
-            propertyModel.PropertyName = propertyInfo.Name;
+            propertyModel.BindingInfo = bindingInfo;
 
             return propertyModel;
         }
@@ -433,25 +433,30 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 throw new ArgumentNullException(nameof(parameterInfo));
             }
 
-            // CoreCLR returns IEnumerable<Attribute> from GetCustomAttributes - the OfType<object>
-            // is needed to so that the result of ToArray() is object
             var attributes = parameterInfo.GetCustomAttributes(inherit: true);
-            var parameterModel = new ParameterModel(parameterInfo, attributes);
+            var parameterModel = new ParameterModel(parameterInfo, attributes)
+            {
+                ParameterName = parameterInfo.Name
+            };
 
-            var bindingInfo = BindingInfo.GetBindingInfo(attributes);
-            if (bindingInfo != null)
+            BindingInfo bindingInfo = null;
+            if (_modelMetadataProvider is ModelMetadataProvider modelMetadataProviderBase)
             {
-                parameterModel.BindingInfo = bindingInfo;
-            }
-            else if (IsFormFileType(parameterInfo.ParameterType))
-            {
-                parameterModel.BindingInfo = new BindingInfo
-                {
-                    BindingSource = BindingSource.FormFile,
-                };
+                var modelMetadata = modelMetadataProviderBase.GetMetadataForParameter(parameterInfo);
+                bindingInfo = BindingInfo.GetBindingInfo(modelMetadata);
             }
 
-            parameterModel.ParameterName = parameterInfo.Name;
+            if (bindingInfo == null)
+            {
+                bindingInfo = BindingInfo.GetBindingInfo(attributes);
+            }
+
+            if (bindingInfo == null && IsFormFileType(parameterInfo.ParameterType))
+            {
+                bindingInfo = new BindingInfo { BindingSource = BindingSource.FormFile, };
+            }
+
+            parameterModel.BindingInfo = bindingInfo;
 
             return parameterModel;
         }

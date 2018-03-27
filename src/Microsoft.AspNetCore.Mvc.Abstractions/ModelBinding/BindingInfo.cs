@@ -134,6 +134,49 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
             return isBindingInfoPresent ? bindingInfo : null;
         }
 
+        /// <summary>
+        /// Gets the <see cref="BindingInfo"/> from a the given <paramref name="modelMetadata"/>.
+        /// </summary>
+        /// <param name="modelMetadata">The <see cref="ModelMetadata"/>.</param>
+        /// <returns>An instance of <see cref="BindingInfo"/>.</returns>
+        public static BindingInfo GetBindingInfo(ModelMetadata modelMetadata)
+        {
+            var bindingInfo = new BindingInfo();
+            var isBindingInfoPresent = false;
+
+            if (modelMetadata.BinderModelName != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BinderModelName = modelMetadata.BinderModelName;
+            }
+
+            if (modelMetadata.BinderType != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BinderType = modelMetadata.BinderType;
+            }
+
+            if (modelMetadata.BindingSource != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BindingSource = modelMetadata.BindingSource;
+            }
+
+            if (modelMetadata.PropertyFilterProvider != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.PropertyFilterProvider = modelMetadata.PropertyFilterProvider;
+            }
+
+            if (modelMetadata.RequestPredicate != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.RequestPredicate = modelMetadata.RequestPredicate;
+            }
+
+            return isBindingInfoPresent ? bindingInfo : null;
+        }
+
         private class CompositePropertyFilterProvider : IPropertyFilterProvider
         {
             private readonly IEnumerable<IPropertyFilterProvider> _providers;

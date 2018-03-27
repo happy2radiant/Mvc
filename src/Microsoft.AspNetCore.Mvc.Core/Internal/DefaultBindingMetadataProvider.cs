@@ -74,6 +74,16 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 context.BindingMetadata.IsBindingAllowed = bindingBehavior.Behavior != BindingBehavior.Never;
                 context.BindingMetadata.IsBindingRequired = bindingBehavior.Behavior == BindingBehavior.Required;
             }
+
+            // RequestPredicateProvider
+            foreach (var requestPredicateProvider in context.Attributes.OfType<IRequestPredicateProvider>())
+            {
+                if (requestPredicateProvider.RequestPredicate != null)
+                {
+                    context.BindingMetadata.RequestPredicate = requestPredicateProvider.RequestPredicate;
+                    break;
+                }
+            }
         }
 
         private static BindingBehaviorAttribute FindBindingBehavior(BindingMetadataProviderContext context)

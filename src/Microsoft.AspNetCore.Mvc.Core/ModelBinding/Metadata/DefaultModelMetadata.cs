@@ -403,6 +403,9 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Metadata
         public override IPropertyValidationFilter PropertyValidationFilter => ValidationMetadata.PropertyValidationFilter;
 
         /// <inheritdoc />
+        public override Func<ActionContext, bool> RequestPredicate => BindingMetadata.RequestPredicate;
+
+        /// <inheritdoc />
         public override bool ValidateChildren
         {
             get

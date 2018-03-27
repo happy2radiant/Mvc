@@ -309,6 +309,13 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         public virtual IPropertyValidationFilter PropertyValidationFilter => null;
 
         /// <summary>
+        /// Gets a predicate which determines whether or not the model should be bound based on state
+        /// from the current request.
+        /// </summary>
+        /// <value>Defaults to <c>null</c>.</value>
+        public virtual Func<ActionContext, bool> RequestPredicate => null;
+
+        /// <summary>
         /// Gets a value that indicates whether properties or elements of the model should be validated.
         /// </summary>
         public abstract bool ValidateChildren { get; }

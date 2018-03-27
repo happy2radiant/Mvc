@@ -18,6 +18,17 @@ namespace Microsoft.AspNetCore.Mvc.Internal
 {
     public class ApiBehaviorApplicationModelProviderTest
     {
+        public ApiBehaviorApplicationModelProviderTest()
+        {
+            MvcOptions = new MvcOptions();
+            new MvcCoreMvcOptionsSetup(new TestHttpRequestStreamReaderFactory()).Configure(MvcOptions);
+            ModelMetadataProvider = TestModelMetadataProvider.CreateProvider(MvcOptions.ModelMetadataDetailsProviders);
+        }
+
+        public MvcOptions MvcOptions { get; private set; }
+
+        public IModelMetadataProvider ModelMetadataProvider { get; private set; }
+
         [Fact]
         public void OnProvidersExecuting_AddsModelStateInvalidFilter_IfTypeIsAnnotatedWithAttribute()
         {
@@ -389,13 +400,11 @@ namespace Microsoft.AspNetCore.Mvc.Internal
         {
             // Arrange
             var actionName = nameof(ParameterBindingController.ComplexTypeModelWithCancellationToken);
-            var actionModel = GetActionModel(typeof(ParameterBindingController), actionName);
-
             // Go through MvcOptions and MvcCoreMvcOptionsSetup to make
             // sure we pick up the proper ModelMetadataDetailsProviders from the options.
-            var options = new MvcOptions();
-            new MvcCoreMvcOptionsSetup(new TestHttpRequestStreamReaderFactory()).Configure(options);
-            var metadataProvider = TestModelMetadataProvider.CreateProvider(options.ModelMetadataDetailsProviders);
+            
+
+            var actionModel = GetActionModel(typeof(ParameterBindingController), actionName);
             var provider = GetProvider(modelMetadataProvider: metadataProvider);
 
             // Act
@@ -519,9 +528,8 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             Assert.Equal("multipart/form-data", Assert.Single(consumesAttribute.ContentTypes));
         }
 
-        private static ApiBehaviorApplicationModelProvider GetProvider(
-            ApiBehaviorOptions options = null,
-            IModelMetadataProvider modelMetadataProvider = null)
+        private ApiBehaviorApplicationModelProvider GetProvider(
+            ApiBehaviorOptions options = null)
         {
             options = options ?? new ApiBehaviorOptions
             {
@@ -529,33 +537,32 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             };
             var optionsAccessor = Options.Create(options);
 
-            modelMetadataProvider = modelMetadataProvider ?? new TestModelMetadataProvider();
             var loggerFactory = NullLoggerFactory.Instance;
 
-            return new ApiBehaviorApplicationModelProvider(optionsAccessor, modelMetadataProvider, loggerFactory);
+            return new ApiBehaviorApplicationModelProvider(optionsAccessor, ModelMetadataProvider, loggerFactory);
         }
 
-        private static ApplicationModelProviderContext GetContext(Type type)
+        private ApplicationModelProviderContext GetContext(Type type)
         {
             var context = new ApplicationModelProviderContext(new[] { type.GetTypeInfo() });
-            new DefaultApplicationModelProvider(Options.Create(new MvcOptions())).OnProvidersExecuting(context);
+            new DefaultApplicationModelProvider(Options.Create(MvcOptions)).OnProvidersExecuting(context);
             return context;
         }
 
-        private static ControllerModel GetControllerModel(Type controllerType)
+        private ControllerModel GetControllerModel(Type controllerType)
         {
             var context = GetContext(controllerType);
             return Assert.Single(context.Result.Controllers);
         }
 
-        private static ActionModel GetActionModel(Type controllerType, string actionName)
+        private ActionModel GetActionModel(Type controllerType, string actionName)
         {
             var context = GetContext(controllerType);
             var controller = Assert.Single(context.Result.Controllers);
             return Assert.Single(controller.Actions, m => m.ActionName == actionName);
         }
 
-        private static ParameterModel GetParameterModel(Type controllerType, string actionName)
+        private ParameterModel GetParameterModel(Type controllerType, string actionName)
         {
             var action = GetActionModel(controllerType, actionName);
             return Assert.Single(action.Parameters);
