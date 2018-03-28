@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         /// Constructs a new instance of <see cref="BindingInfo"/> from the given <paramref name="attributes"/>.
         /// <para>
         /// <see cref="GetBindingInfo(IEnumerable{object})"/> does not account for binding information configured using
-        /// <see cref="ModelMetadata"/>. Use of this method is discouraged in lieu of <see cref="ModelMetadata.GetBindingInfo"/>.
+        /// <see cref="ModelMetadata"/>.
         /// </para>
         /// </summary>
         /// <param name="attributes">A collection of attributes which are used to construct <see cref="BindingInfo"/>
@@ -133,6 +133,70 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
                     bindingInfo.RequestPredicate = requestPredicateProvider.RequestPredicate;
                     break;
                 }
+            }
+
+            return isBindingInfoPresent ? bindingInfo : null;
+        }
+
+        /// <summary>
+        /// Constructs a new instance of <see cref="BindingInfo"/> from the given <paramref name="attributes"/> and <paramref name="modelMetadata"/>.
+        /// <para>
+        /// <see cref="GetBindingInfo(IEnumerable{object})"/> does not account for binding information configured using
+        /// <see cref="ModelMetadata"/>.
+        /// </para>
+        /// </summary>
+        /// <param name="attributes">A collection of attributes which are used to construct <see cref="BindingInfo"/>.</param>
+        /// <param name="modelMetadata">The <see cref="ModelMetadata"/>.</param>
+        /// <returns>A new instance of <see cref="BindingInfo"/>.</returns>
+        public static BindingInfo GetBindingInfo(IEnumerable<object> attributes, ModelMetadata modelMetadata)
+        {
+            if (attributes == null)
+            {
+                throw new ArgumentNullException(nameof(attributes));
+            }
+
+            if (modelMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(modelMetadata));
+            }
+
+            var bindingInfo = GetBindingInfo(attributes);
+            if (bindingInfo != null)
+            {
+                return bindingInfo;
+            }
+
+            bindingInfo = new BindingInfo();
+            var isBindingInfoPresent = false;
+
+            if (modelMetadata.BinderModelName != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BinderModelName = modelMetadata.BinderModelName;
+            }
+
+            if (modelMetadata.BinderType != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BinderType = modelMetadata.BinderType;
+            }
+
+            if (modelMetadata.BindingSource != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BindingSource = modelMetadata.BindingSource;
+            }
+
+            if (modelMetadata.PropertyFilterProvider != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.PropertyFilterProvider = modelMetadata.PropertyFilterProvider;
+            }
+
+            if (modelMetadata.RequestPredicate != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.RequestPredicate = modelMetadata.RequestPredicate;
             }
 
             return isBindingInfoPresent ? bindingInfo : null;

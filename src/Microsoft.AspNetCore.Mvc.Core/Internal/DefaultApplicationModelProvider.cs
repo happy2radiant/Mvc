@@ -224,7 +224,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             };
 
             var modelMetadata = _modelMetadataProvider.GetMetadataForProperty(propertyInfo.DeclaringType, propertyInfo.Name);
-            var bindingInfo = modelMetadata.GetBindingInfo();
+            var bindingInfo = BindingInfo.GetBindingInfo(attributes, modelMetadata);
             if (bindingInfo == null && IsFormFileType(propertyInfo.PropertyType))
             {
                 bindingInfo = new BindingInfo { BindingSource = BindingSource.FormFile, };
@@ -439,11 +439,11 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 ParameterName = parameterInfo.Name
             };
 
-            BindingInfo bindingInfo = null;
+            BindingInfo bindingInfo;
             if (_modelMetadataProvider is ModelMetadataProvider modelMetadataProviderBase)
             {
                 var modelMetadata = modelMetadataProviderBase.GetMetadataForParameter(parameterInfo);
-                bindingInfo = modelMetadata.GetBindingInfo();
+                bindingInfo = BindingInfo.GetBindingInfo(attributes, modelMetadata);
             }
             else
             {

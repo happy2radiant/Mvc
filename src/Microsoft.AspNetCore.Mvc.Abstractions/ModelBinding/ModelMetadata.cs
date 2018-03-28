@@ -309,13 +309,6 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         public virtual IPropertyValidationFilter PropertyValidationFilter => null;
 
         /// <summary>
-        /// Gets a predicate which determines whether or not the model should be bound based on state
-        /// from the current request.
-        /// </summary>
-        /// <value>Defaults to <c>null</c>.</value>
-        public virtual Func<ActionContext, bool> RequestPredicate => null;
-
-        /// <summary>
         /// Gets a value that indicates whether properties or elements of the model should be validated.
         /// </summary>
         public abstract bool ValidateChildren { get; }
@@ -397,48 +390,6 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         public string GetDisplayName()
         {
             return DisplayName ?? PropertyName ?? ModelType.Name;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="BindingInfo"/> for the model.
-        /// </summary>
-        /// <returns>The <see cref="BindingInfo"/>.</returns>
-        public virtual BindingInfo GetBindingInfo()
-        {
-            var bindingInfo = new BindingInfo();
-            var isBindingInfoPresent = false;
-
-            if (BinderModelName != null)
-            {
-                isBindingInfoPresent = true;
-                bindingInfo.BinderModelName = BinderModelName;
-            }
-
-            if (BinderType != null)
-            {
-                isBindingInfoPresent = true;
-                bindingInfo.BinderType = BinderType;
-            }
-
-            if (BindingSource != null)
-            {
-                isBindingInfoPresent = true;
-                bindingInfo.BindingSource = BindingSource;
-            }
-
-            if (PropertyFilterProvider != null)
-            {
-                isBindingInfoPresent = true;
-                bindingInfo.PropertyFilterProvider = PropertyFilterProvider;
-            }
-
-            if (RequestPredicate != null)
-            {
-                isBindingInfoPresent = true;
-                bindingInfo.RequestPredicate = RequestPredicate;
-            }
-
-            return isBindingInfoPresent ? bindingInfo : null;
         }
 
         /// <inheritdoc />

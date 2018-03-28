@@ -225,11 +225,11 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
 
             var attributes = parameter.GetCustomAttributes(inherit: true);
 
-            BindingInfo bindingInfo = null;
+            BindingInfo bindingInfo;
             if (_modelMetadataProvider is ModelMetadataProvider modelMetadataProviderBase)
             {
                 var modelMetadata = modelMetadataProviderBase.GetMetadataForParameter(parameter);
-                bindingInfo = modelMetadata.GetBindingInfo();
+                bindingInfo = BindingInfo.GetBindingInfo(attributes, modelMetadata);
             }
             else
             {
@@ -260,14 +260,16 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
             var propertyAttributes = property.GetCustomAttributes(inherit: true);
 
             var propertyMetadata = _modelMetadataProvider.GetMetadataForProperty(property.DeclaringType, property.Name);
-            var bindingInfo = propertyMetadata.GetBindingInfo();
+            var bindingInfo = BindingInfo.GetBindingInfo(propertyAttributes, propertyMetadata);
 
             if (bindingInfo == null)
             {
                 // Look for binding info on the handler if nothing is specified on the property.
                 // This allows BindProperty attributes on handlers to apply to properties.
+                var handlerType = property.DeclaringType;
+                var handlerAttributes = handlerType.GetCustomAttributes(inherit: true);
                 var handlerMetadata = _modelMetadataProvider.GetMetadataForType(property.DeclaringType);
-                bindingInfo = handlerMetadata.GetBindingInfo();
+                bindingInfo = BindingInfo.GetBindingInfo(handlerAttributes, handlerMetadata);
             }
 
             var model = new PagePropertyModel(property, propertyAttributes)

@@ -400,10 +400,6 @@ namespace Microsoft.AspNetCore.Mvc.Internal
         {
             // Arrange
             var actionName = nameof(ParameterBindingController.ComplexTypeModelWithCancellationToken);
-            // Go through MvcOptions and MvcCoreMvcOptionsSetup to make
-            // sure we pick up the proper ModelMetadataDetailsProviders from the options.
-            
-
             var actionModel = GetActionModel(typeof(ParameterBindingController), actionName);
             var provider = GetProvider();
 

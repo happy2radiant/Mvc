@@ -403,11 +403,6 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Metadata
         public override IPropertyValidationFilter PropertyValidationFilter => ValidationMetadata.PropertyValidationFilter;
 
         /// <inheritdoc />
-        public override Func<ActionContext, bool> RequestPredicate => BindingMetadata.RequestPredicate;
-
-        public bool HasBindingMetadata => BindingMetadata.HasBindingMetadata;
-
-        /// <inheritdoc />
         public override bool ValidateChildren
         {
             get
@@ -462,21 +457,6 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Metadata
         public override IEnumerable<ModelMetadata> GetMetadataForProperties(Type modelType)
         {
             return _provider.GetMetadataForProperties(modelType);
-        }
-
-        public override BindingInfo GetBindingInfo()
-        {
-            var bindingInfo = base.GetBindingInfo();
-            if (bindingInfo == null && HasBindingMetadata)
-            {
-                // BindingInfo.GetBindingInfo(IEnumerable<Attributes>) would return a non-null BindingInfo if any binding
-                // specific metadata was associated with a model. Types such as WebApiParameterConventionsApplicationModelConvention 
-                // rely on the presence of BindingInfo to make decisions. Emulate the behavior to maintain compat with 
-                // BindingInfo.GetBindingInfo and return a non-null model when any metadata is present.
-                return new BindingInfo();
-            }
-
-            return bindingInfo;
         }
     }
 }
