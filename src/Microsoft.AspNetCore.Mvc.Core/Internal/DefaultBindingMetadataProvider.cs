@@ -22,9 +22,12 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 throw new ArgumentNullException(nameof(context));
             }
 
+            var isBindingInfoPresent = false;
+
             // BinderModelName
             foreach (var binderModelNameAttribute in context.Attributes.OfType<IModelNameProvider>())
             {
+                isBindingInfoPresent = true;
                 if (binderModelNameAttribute?.Name != null)
                 {
                     context.BindingMetadata.BinderModelName = binderModelNameAttribute.Name;
@@ -35,6 +38,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             // BinderType
             foreach (var binderTypeAttribute in context.Attributes.OfType<IBinderTypeProviderMetadata>())
             {
+                isBindingInfoPresent = true;
                 if (binderTypeAttribute.BinderType != null)
                 {
                     context.BindingMetadata.BinderType = binderTypeAttribute.BinderType;
@@ -45,6 +49,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             // BindingSource
             foreach (var bindingSourceAttribute in context.Attributes.OfType<IBindingSourceMetadata>())
             {
+                isBindingInfoPresent = true;
                 if (bindingSourceAttribute.BindingSource != null)
                 {
                     context.BindingMetadata.BindingSource = bindingSourceAttribute.BindingSource;
@@ -52,18 +57,27 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 }
             }
 
+            // HasBindingMetadata is true if the 
+            if (isBindingInfoPresent)
+            {
+                context.BindingMetadata.HasBindingMetadata = true;
+            }
+
             // PropertyFilterProvider
             var propertyFilterProviders = context.Attributes.OfType<IPropertyFilterProvider>().ToArray();
+
             if (propertyFilterProviders.Length == 0)
             {
                 context.BindingMetadata.PropertyFilterProvider = null;
             }
             else if (propertyFilterProviders.Length == 1)
             {
+                isBindingInfoPresent = true;
                 context.BindingMetadata.PropertyFilterProvider = propertyFilterProviders[0];
             }
             else
             {
+                isBindingInfoPresent = true;
                 var composite = new CompositePropertyFilterProvider(propertyFilterProviders);
                 context.BindingMetadata.PropertyFilterProvider = composite;
             }
@@ -71,6 +85,11 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             var bindingBehavior = FindBindingBehavior(context);
             if (bindingBehavior != null)
             {
+                // Note: We intentionally do not include the presence of BindingBehavrioAttribute to calculate
+                // isBindingInfoPresent. This is match the behavior of BindingInfo.GetBindingInfo() that did not inspect
+                // this attribute. This additionally ensures that parameters and properties annotated with 
+                // such as BindRequiredAttribute \ BindNeverAttribute, do not get model bound unless they explicitly have
+                // a different model binding related attribute.
                 context.BindingMetadata.IsBindingAllowed = bindingBehavior.Behavior != BindingBehavior.Never;
                 context.BindingMetadata.IsBindingRequired = bindingBehavior.Behavior == BindingBehavior.Required;
             }
@@ -78,11 +97,17 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             // RequestPredicateProvider
             foreach (var requestPredicateProvider in context.Attributes.OfType<IRequestPredicateProvider>())
             {
+                isBindingInfoPresent = true;
                 if (requestPredicateProvider.RequestPredicate != null)
                 {
                     context.BindingMetadata.RequestPredicate = requestPredicateProvider.RequestPredicate;
                     break;
                 }
+            }
+
+            if (isBindingInfoPresent)
+            {
+                context.BindingMetadata.HasBindingMetadata = isBindingInfoPresent;
             }
         }
 

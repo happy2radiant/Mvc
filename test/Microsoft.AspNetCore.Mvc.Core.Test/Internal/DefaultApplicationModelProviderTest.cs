@@ -1404,13 +1404,14 @@ namespace Microsoft.AspNetCore.Mvc.Internal
         private class TestApplicationModelProvider : DefaultApplicationModelProvider
         {
             public TestApplicationModelProvider()
-                : this(Options.Create(new MvcOptions()))
+                : this(Options.Create(new MvcOptions()), TestModelMetadataProvider.CreateDefaultProvider())
             {
             }
 
             public TestApplicationModelProvider(
-                IOptions<MvcOptions> options)
-                : base(options)
+                IOptions<MvcOptions> options,
+                IModelMetadataProvider modelMetadataProvider)
+                : base(options, modelMetadataProvider)
             {
             }
 

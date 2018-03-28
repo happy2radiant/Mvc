@@ -224,7 +224,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             };
 
             var modelMetadata = _modelMetadataProvider.GetMetadataForProperty(propertyInfo.DeclaringType, propertyInfo.Name);
-            var bindingInfo = BindingInfo.GetBindingInfo(modelMetadata) ?? BindingInfo.GetBindingInfo(attributes);
+            var bindingInfo = modelMetadata.GetBindingInfo();
             if (bindingInfo == null && IsFormFileType(propertyInfo.PropertyType))
             {
                 bindingInfo = new BindingInfo { BindingSource = BindingSource.FormFile, };
@@ -443,11 +443,12 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             if (_modelMetadataProvider is ModelMetadataProvider modelMetadataProviderBase)
             {
                 var modelMetadata = modelMetadataProviderBase.GetMetadataForParameter(parameterInfo);
-                bindingInfo = BindingInfo.GetBindingInfo(modelMetadata);
+                bindingInfo = modelMetadata.GetBindingInfo();
             }
-
-            if (bindingInfo == null)
+            else
             {
+                // For backward compatibility, if there's a custom model metadata provider that
+                // only implements the older IModelMetadataProvider interface, construct BindingInfo using attributes.
                 bindingInfo = BindingInfo.GetBindingInfo(attributes);
             }
 

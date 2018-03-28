@@ -229,10 +229,14 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
             if (_modelMetadataProvider is ModelMetadataProvider modelMetadataProviderBase)
             {
                 var modelMetadata = modelMetadataProviderBase.GetMetadataForParameter(parameter);
-                bindingInfo = BindingInfo.GetBindingInfo(modelMetadata);
+                bindingInfo = modelMetadata.GetBindingInfo();
             }
-
-            bindingInfo = bindingInfo ?? BindingInfo.GetBindingInfo(attributes);
+            else
+            {
+                // For backward compatibility, if there's a custom model metadata provider that
+                // only implements the older IModelMetadataProvider interface, construct BindingInfo using attributes.
+                bindingInfo = BindingInfo.GetBindingInfo(attributes);
+            }
 
             return new PageParameterModel(parameter, attributes)
             {
@@ -256,15 +260,14 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
             var propertyAttributes = property.GetCustomAttributes(inherit: true);
 
             var propertyMetadata = _modelMetadataProvider.GetMetadataForProperty(property.DeclaringType, property.Name);
-            var bindingInfo = BindingInfo.GetBindingInfo(propertyMetadata) ?? BindingInfo.GetBindingInfo(propertyAttributes);
+            var bindingInfo = propertyMetadata.GetBindingInfo();
 
             if (bindingInfo == null)
             {
                 // Look for binding info on the handler if nothing is specified on the property.
                 // This allows BindProperty attributes on handlers to apply to properties.
                 var handlerMetadata = _modelMetadataProvider.GetMetadataForType(property.DeclaringType);
-                var handlerAttributes = property.DeclaringType.GetCustomAttributes(inherit: true);
-                bindingInfo = BindingInfo.GetBindingInfo(handlerMetadata) ?? BindingInfo.GetBindingInfo(handlerAttributes);
+                bindingInfo = handlerMetadata.GetBindingInfo();
             }
 
             var model = new PagePropertyModel(property, propertyAttributes)

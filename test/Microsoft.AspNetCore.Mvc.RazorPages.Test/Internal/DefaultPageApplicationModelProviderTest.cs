@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_ThrowsIfPageDoesNotDeriveFromValidBaseType()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(InvalidPageWithWrongBaseClass).GetTypeInfo();
             var descriptor = new PageActionDescriptor();
             var context = new PageApplicationModelProviderContext(descriptor, typeInfo);
@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_ThrowsIfModelPropertyDoesNotExistOnPage()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithoutModelProperty).GetTypeInfo();
             var descriptor = new PageActionDescriptor();
             var context = new PageApplicationModelProviderContext(descriptor, typeInfo);
@@ -85,7 +85,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_ThrowsIfModelPropertyIsNotPublic()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithNonVisibleModel).GetTypeInfo();
             var descriptor = new PageActionDescriptor();
             var context = new PageApplicationModelProviderContext(descriptor, typeInfo);
@@ -110,7 +110,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_ThrowsIfModelPropertyIsStatic()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithStaticModel).GetTypeInfo();
             var descriptor = new PageActionDescriptor();
             var context = new PageApplicationModelProviderContext(descriptor, typeInfo);
@@ -135,7 +135,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_DiscoversPropertiesFromPage_IfModelTypeDoesNotHaveAttribute()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithModelWithoutPageModelAttribute).GetTypeInfo();
             var descriptor = new PageActionDescriptor();
             var context = new PageApplicationModelProviderContext(descriptor, typeInfo);
@@ -189,7 +189,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_DiscoversPropertiesFromPageModel_IfModelHasAttribute()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithModelWithPageModelAttribute).GetTypeInfo();
             var modelType = typeof(ModelWithPageModelAttribute);
             var descriptor = new PageActionDescriptor();
@@ -233,7 +233,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_DiscoversProperties_FromAllSubTypesThatDeclaresBindProperty()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(BindPropertyAttributeOnBaseModelPage).GetTypeInfo();
             var descriptor = new PageActionDescriptor();
             var context = new PageApplicationModelProviderContext(descriptor, typeInfo);
@@ -287,7 +287,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_DiscoversHandlersFromPage()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithModelWithoutHandlers).GetTypeInfo();
             var descriptor = new PageActionDescriptor();
             var context = new PageApplicationModelProviderContext(descriptor, typeInfo);
@@ -329,7 +329,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_DiscoversPropertiesFromModel()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithModel).GetTypeInfo();
             var modelType = typeof(TestPageModel);
             var descriptor = new PageActionDescriptor();
@@ -363,7 +363,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_DiscoversBindingInfoFromHandler()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithBindPropertyModel).GetTypeInfo();
             var modelType = typeof(ModelWithBindProperty);
             var descriptor = new PageActionDescriptor();
@@ -410,7 +410,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_DiscoversHandlersFromModel()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithModel).GetTypeInfo();
             var modelType = typeof(TestPageModel);
             var descriptor = new PageActionDescriptor();
@@ -438,7 +438,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_EmptyPage()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(EmptyPage).GetTypeInfo();
             var context = new PageApplicationModelProviderContext(new PageActionDescriptor(), typeInfo);
 
@@ -459,7 +459,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_EmptyPageModel()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(EmptyPageWithPageModel).GetTypeInfo();
             var context = new PageApplicationModelProviderContext(new PageActionDescriptor(), typeInfo);
 
@@ -528,7 +528,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void CreateDescriptor_FindsHandlerMethod_OnModel()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithHandlerThatGetsIgnored).GetTypeInfo();
             var modelType = typeof(ModelWithHandler);
             var context = new PageApplicationModelProviderContext(new PageActionDescriptor(), typeInfo);
@@ -575,7 +575,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void OnProvidersExecuting_FindsHandlerMethodOnPage_WhenModelIsNotAnnotatedWithPageModelAttribute()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithHandler).GetTypeInfo();
             var context = new PageApplicationModelProviderContext(new PageActionDescriptor(), typeInfo);
 
@@ -626,7 +626,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateHandlerMethods_DiscoversHandlersFromBaseType()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(InheritsMethods).GetTypeInfo();
             var baseType = typeof(TestSetPageModel);
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
@@ -677,7 +677,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateHandlerMethods_IgnoresNonPublicMethods()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(ProtectedModel).GetTypeInfo();
             var baseType = typeof(TestSetPageModel);
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
@@ -705,7 +705,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateHandlerMethods_IgnoreGenericTypeParameters()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(GenericClassModel).GetTypeInfo();
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
 
@@ -728,7 +728,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateHandlerMethods_IgnoresStaticMethods()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageModelWithStaticHandler).GetTypeInfo();
             var expected = typeInfo.GetMethod(nameof(PageModelWithStaticHandler.OnGet), BindingFlags.Public | BindingFlags.Instance);
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
@@ -758,7 +758,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateHandlerMethods_IgnoresAbstractMethods()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageModelWithAbstractMethod).GetTypeInfo();
             var expected = typeInfo.GetMethod(nameof(PageModelWithAbstractMethod.OnGet), BindingFlags.Public | BindingFlags.Instance);
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
@@ -786,7 +786,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateHandlerMethods_IgnoresMethodWithNonHandlerAttribute()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithNonHandlerMethod).GetTypeInfo();
             var expected = typeInfo.GetMethod(nameof(PageWithNonHandlerMethod.OnGet), BindingFlags.Public | BindingFlags.Instance);
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
@@ -817,7 +817,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void CreateHandlerModel_ParsesMethod()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageModelWithHandlerNames).GetTypeInfo();
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
 
@@ -851,7 +851,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void CreateHandlerMethods_AddsParameterDescriptors()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(PageWithHandlerParameters).GetTypeInfo();
             var expected = typeInfo.GetMethod(nameof(PageWithHandlerParameters.OnPost));
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
@@ -895,7 +895,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateHandlerProperties_UsesPropertyHelpers_ToFindProperties()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(HidesAProperty).GetTypeInfo();
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
 
@@ -928,7 +928,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateHandlerProperties_SupportsGet_OnProperty()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(ModelSupportsGetOnProperty).GetTypeInfo();
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, new object[0]);
 
@@ -1039,7 +1039,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateFilters_AddsIFilterMetadataAttributesToModel()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(FilterModel).GetTypeInfo();
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, typeInfo.GetCustomAttributes(inherit: true));
 
@@ -1063,7 +1063,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateFilters_AddsPageHandlerPageFilter_IfPageImplementsIAsyncPageFilter()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(ModelImplementingAsyncPageFilter).GetTypeInfo();
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, typeInfo.GetCustomAttributes(inherit: true));
 
@@ -1093,7 +1093,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateFilters_AddsPageHandlerPageFilter_IfPageImplementsIPageFilter()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(ModelImplementingPageFilter).GetTypeInfo();
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, typeInfo.GetCustomAttributes(inherit: true));
 
@@ -1128,7 +1128,7 @@ namespace Microsoft.AspNetCore.Mvc.RazorPages.Internal
         public void PopulateFilters_AddsPageHandlerPageFilter_ForModelDerivingFromTypeImplementingPageFilter()
         {
             // Arrange
-            var provider = new DefaultPageApplicationModelProvider();
+            var provider = new DefaultPageApplicationModelProvider(TestModelMetadataProvider.CreateDefaultProvider());
             var typeInfo = typeof(DerivedFromPageModel).GetTypeInfo();
             var pageModel = new PageApplicationModel(new PageActionDescriptor(), typeInfo, typeInfo.GetCustomAttributes(inherit: true));
 

@@ -405,7 +405,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             
 
             var actionModel = GetActionModel(typeof(ParameterBindingController), actionName);
-            var provider = GetProvider(modelMetadataProvider: metadataProvider);
+            var provider = GetProvider();
 
             // Act
             provider.InferParameterBindingSources(actionModel);
@@ -545,7 +545,9 @@ namespace Microsoft.AspNetCore.Mvc.Internal
         private ApplicationModelProviderContext GetContext(Type type)
         {
             var context = new ApplicationModelProviderContext(new[] { type.GetTypeInfo() });
-            new DefaultApplicationModelProvider(Options.Create(MvcOptions)).OnProvidersExecuting(context);
+            var provider = new DefaultApplicationModelProvider(Options.Create(MvcOptions), ModelMetadataProvider);
+            provider.OnProvidersExecuting(context);
+
             return context;
         }
 

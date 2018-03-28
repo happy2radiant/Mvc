@@ -81,5 +81,15 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding.Metadata
         /// from the current request.
         /// </summary>
         public Func<ActionContext, bool> RequestPredicate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether or nor not the model has any binding metadata.
+        /// <para>
+        /// A model may be associated with instances of binding specific providers such as 
+        /// <see cref="IBinderTypeProviderMetadata"/> or <see cref="IBindingSourceMetadata"/> that provide default
+        /// (e.g. <see langword="null" />) values. This property indicates the presence of such binding specific metadata.
+        /// </para>
+        /// </summary>
+        public bool HasBindingMetadata { get; set; }
     }
 }

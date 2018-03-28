@@ -399,6 +399,48 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
             return DisplayName ?? PropertyName ?? ModelType.Name;
         }
 
+        /// <summary>
+        /// Gets the <see cref="BindingInfo"/> for the model.
+        /// </summary>
+        /// <returns>The <see cref="BindingInfo"/>.</returns>
+        public virtual BindingInfo GetBindingInfo()
+        {
+            var bindingInfo = new BindingInfo();
+            var isBindingInfoPresent = false;
+
+            if (BinderModelName != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BinderModelName = BinderModelName;
+            }
+
+            if (BinderType != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BinderType = BinderType;
+            }
+
+            if (BindingSource != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.BindingSource = BindingSource;
+            }
+
+            if (PropertyFilterProvider != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.PropertyFilterProvider = PropertyFilterProvider;
+            }
+
+            if (RequestPredicate != null)
+            {
+                isBindingInfoPresent = true;
+                bindingInfo.RequestPredicate = RequestPredicate;
+            }
+
+            return isBindingInfoPresent ? bindingInfo : null;
+        }
+
         /// <inheritdoc />
         public bool Equals(ModelMetadata other)
         {
